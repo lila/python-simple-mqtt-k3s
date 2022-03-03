@@ -14,7 +14,7 @@ debug = os.environ.get("MQTT_DEBUG", False)
 mqttBroker = os.environ.get("MQTT_HOST", "192.168.1.4")
 mqttPort = int(os.environ.get("MQTT_PORT", "1883"))
 topic = os.environ.get("MQTT_TOPIC", "random/TEMPERATURE")
-sleep_duration = int(os.environ.get("MQTT_SLEEP_DURATION"), "5")
+sleep_duration = int(os.environ.get("MQTT_SLEEP_DURATION", "5"))
 
 if debug:
     print(f"connecting to mqtt://{mqttBroker}:{mqttPort}/")
