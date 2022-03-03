@@ -1,0 +1,7 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [ 'run', '--rm', '--privileged', 'multiarch/qemu-user-static:register', '--reset' ]
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [ 'build', '-t', 'gcr.io/$PROJECT_ID/python-simple-mqtt-k3s-arm', '.' ]
+images:
+  - 'gcr.io/$PROJECT_ID/python-simple-mqtt-k3s-arm'

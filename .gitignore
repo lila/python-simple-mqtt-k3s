@@ -1,0 +1,11 @@
+*.py[cod]
+.idea
+.vscode
+*.iml
+*.bak
+venv
+tags
+dist
+build
+*.egg-info
+service-account.json
