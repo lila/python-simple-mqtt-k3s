@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-simple-mqtt
+spec:
+  selector:
+    matchLabels:
+      app: python-simple-mqtt
+  template:
+    metadata:
+      labels:
+        app: python-simple-mqtt
+    spec:
+      containers:
+        - name: python-simple-mqtt
+          image: "ghcr.io/lila/python-simple-mqtt-k3s:main"
+          env:
+            - name: MQTT_HOST
+              value: "192.168.86.4" 
+            - name: MQTT_DEBUG
+              value: "true"
