@@ -37,6 +37,7 @@ client.connect(mqttBroker, mqttPort)
 # set up google calendar creds and apis
 #
 from secrets import secrets
+
 TOKEN_OBTAINED_AT: int
 TOKEN_OBTAINED_AT = 0
 TIMEZONE = "+00:00"
@@ -54,9 +55,11 @@ GOOGLE_AUTH = OAuth2(
 def _refresh_token() -> None:
     global TOKEN_OBTAINED_AT
     # Check if we have a token, if not we need to get one
-    if (GOOGLE_AUTH.access_token_expiration is None
+    if (
+        GOOGLE_AUTH.access_token_expiration is None
         or int(time.monotonic()) - TOKEN_OBTAINED_AT
-            >= GOOGLE_AUTH.access_token_expiration):
+        >= GOOGLE_AUTH.access_token_expiration
+    ):
         print("Fetching a new access token ...")
         if not GOOGLE_AUTH.refresh_access_token():
             raise RuntimeError(
@@ -67,11 +70,24 @@ def _refresh_token() -> None:
 
 def _iso_date(date: time.struct_time) -> str:
     return "{:04d}-{:02d}-{:02d}T{:02d}:{:02d}:{:02d}{:s}".format(
-        date.tm_year, date.tm_mon, date.tm_mday, date.tm_hour, date.tm_min, date.tm_sec, TIMEZONE)
+        date.tm_year,
+        date.tm_mon,
+        date.tm_mday,
+        date.tm_hour,
+        date.tm_min,
+        date.tm_sec,
+        TIMEZONE,
+    )
 
 
 def _url_encode(raw: str) -> str:
-    return raw.replace(":", "%3A").replace("+", "%2B").replace(" ", "%20").replace("/", "%2F")
+    return (
+        raw.replace(":", "%3A")
+        .replace("+", "%2B")
+        .replace(" ", "%20")
+        .replace("/", "%2F")
+    )
+
 
 def _fetch_events(event_count: int = 3) -> list:
     # see: https://developers.google.com/calendar/api/v3/reference/events/list
@@ -79,9 +95,11 @@ def _fetch_events(event_count: int = 3) -> list:
 
     now = _iso_date(time.gmtime())
     minTime = _url_encode(now)
-    url = ("https://www.googleapis.com/calendar/v3/calendars/{0}"
-           "/events?maxResults={1}&timeMin={2}&orderBy=startTime"
-           "&singleEvents=true").format(secrets['calendar_id'], event_count, minTime)
+    url = (
+        "https://www.googleapis.com/calendar/v3/calendars/{0}"
+        "/events?maxResults={1}&timeMin={2}&orderBy=startTime"
+        "&singleEvents=true"
+    ).format(secrets["calendar_id"], event_count, minTime)
     headers = {
         "Authorization": "Bearer " + GOOGLE_AUTH.access_token,
         "Accept": "application/json",
@@ -104,7 +122,7 @@ def _fetch_events(event_count: int = 3) -> list:
 
 while True:
     el = _fetch_events()
-    events = {e['summary'] for e in el}
+    events = {e["summary"] for e in el}
     client.publish(f"{secrets['calendar_id']}/{topic}", str(events))
     if debug:
         print(f"Just published {events} to Topic {topic}")
