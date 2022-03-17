@@ -40,6 +40,9 @@ client.connect(mqttBroker, mqttPort)
 
 
 path = str(Path(__file__).parent.parent.absolute())
+if debug:
+    print("credentials stored in: " + path + "/secrets")
+    print(os.listdir(path+"/secrets"))
 sys.path.insert(1, path+"/secrets")
 from secrets import secrets
 

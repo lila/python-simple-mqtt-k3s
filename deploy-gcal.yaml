@@ -23,6 +23,8 @@ spec:
               value: "192.168.86.4" 
             - name: MQTT_DEBUG
               value: "true"
+            - name: MQTT_APP
+              value: "gcal.py"
           volumeMounts:
             - mountPath: "/secure/"
               name: credentials
