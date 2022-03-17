@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-simple-mqtt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-simple-mqtt
+  template:
+    metadata:
+      labels:
+        app: python-simple-mqtt
+    spec:
+      nodeSelector:
+        nodetype: pi3
+      containers:
+        - name: python-simple-mqtt
+          image: "ghcr.io/lila/python-simple-mqtt-k3s:main"
+          imagePullPolicy: Always
+          env:
+            - name: MQTT_HOST
+              value: "192.168.86.4" 
+            - name: MQTT_DEBUG
+              value: "true"
+          volumeMounts:
+            - mountPath: "/secure/"
+              name: credentials
+              readOnly: true
+      volumes:
+        - name: credentials
+          secret:
+            secretName: gcal-credentials

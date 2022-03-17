@@ -12,6 +12,7 @@ import sys
 import time
 import json
 import requests
+from pathlib import Path
 import paho.mqtt.client as mqtt
 from OAuth2 import OAuth2
 
@@ -36,6 +37,10 @@ client.connect(mqttBroker, mqttPort)
 #
 # set up google calendar creds and apis
 #
+
+
+path = str(Path(__file__).parent.parent.absolute())
+sys.path.insert(1, path+"/secrets")
 from secrets import secrets
 
 TOKEN_OBTAINED_AT: int
