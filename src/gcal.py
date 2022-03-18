@@ -130,8 +130,17 @@ def _fetch_events(event_count: int = 3) -> list:
 
 while True:
     el = _fetch_events()
-    r = client.publish(f"{secrets['calendar_id']}/{topic}", json.dumps(el, indent=4))
+    (r, mid) = client.publish(f"{secrets['calendar_id']}/{topic}", json.dumps(el, indent=4))
+    sys.stdout.flush()
+
     if debug:
         print(f"Just published to Topic {topic}: {r}")
-    sys.stdout.flush()
+
+    if r != 0:
+        if debug:
+            print("restarting mqtt client")
+
+        client = mqtt.Client("Google Calendar updater")
+        client.connect(mqttBroker, mqttPort)
+
     time.sleep(sleep_duration)
