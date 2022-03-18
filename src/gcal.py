@@ -130,8 +130,8 @@ def _fetch_events(event_count: int = 3) -> list:
 
 while True:
     el = _fetch_events()
-    client.publish(f"{secrets['calendar_id']}/{topic}", json.dumps(el, indent=4))
+    r = client.publish(f"{secrets['calendar_id']}/{topic}", json.dumps(el, indent=4))
     if debug:
-        print(f"Just published {json.dumps(el, indent=4)} to Topic {topic}")
+        print(f"Just published to Topic {topic}: {r}")
     sys.stdout.flush()
     time.sleep(sleep_duration)

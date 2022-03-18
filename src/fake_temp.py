@@ -25,8 +25,8 @@ client.connect(mqttBroker, mqttPort)
 
 while True:
     randNumber = randrange(10)
-    client.publish(topic, randNumber)
+    r = client.publish(topic, randNumber)
     if debug:
-        print(f"Just published {randNumber} to Topic {topic}")
+        print(f"Just published {randNumber} to Topic {topic}: {r}")
     sys.stdout.flush()
     time.sleep(sleep_duration)
