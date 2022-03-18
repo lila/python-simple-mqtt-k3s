@@ -13,7 +13,7 @@ import time
 import json
 import requests
 from pathlib import Path
-import paho.mqtt.client as mqtt
+import paho.mqtt.publish as publish
 from OAuth2 import OAuth2
 
 #
@@ -31,8 +31,6 @@ sleep_duration = int(os.environ.get("MQTT_SLEEP_DURATION", "5"))
 if debug:
     print(f"connecting to mqtt://{mqttBroker}:{mqttPort}/")
 
-client = mqtt.Client("Google Calendar updater")
-client.connect(mqttBroker, mqttPort)
 
 #
 # set up google calendar creds and apis
@@ -42,8 +40,8 @@ client.connect(mqttBroker, mqttPort)
 path = str(Path(__file__).parent.parent.absolute())
 if debug:
     print("credentials stored in: " + path + "/secrets")
-    print(os.listdir(path+"/secrets"))
-sys.path.insert(1, path+"/secrets")
+    print(os.listdir(path + "/secrets"))
+sys.path.insert(1, path + "/secrets")
 from secrets import secrets
 
 TOKEN_OBTAINED_AT: int
@@ -130,17 +128,17 @@ def _fetch_events(event_count: int = 3) -> list:
 
 while True:
     el = _fetch_events()
-    (r, mid) = client.publish(f"{secrets['calendar_id']}/{topic}", json.dumps(el, indent=4))
-    sys.stdout.flush()
+
+    publish.single(
+        f"{secrets['calendar_id']}/{topic}",
+        json.dumps(el, indent=4),
+        hostname=mqttBroker,
+        port=mqttPort,
+        client_id="Google Calendar updater",
+    )
 
     if debug:
-        print(f"Just published to Topic {topic}: {r}")
+        print(f"Just published to Topic {topic}")
 
-    if r != 0:
-        if debug:
-            print("restarting mqtt client")
-
-        client = mqtt.Client("Google Calendar updater")
-        client.connect(mqttBroker, mqttPort)
-
+    sys.stdout.flush()
     time.sleep(sleep_duration)
