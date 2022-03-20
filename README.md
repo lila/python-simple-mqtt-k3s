@@ -68,6 +68,67 @@ spec:
               value: "true"
 ```
 
+## publish calendar events
+
+In addition to the simple numerical example, I added a more complex example that
+connects to google calendar api to retrieve your current calender events and publishes
+the json to the mqtt broker. 
+
+Setup is more complex, as you need to get the api keys, see `./secrets` for a template.
+See here:  https://learn.adafruit.com/pyportal-google-calendar-event-display/code-setup  
+for details on how to get the api keys from google calendar. 
+
+Once you add your keys to `secrets/secrets.py`, you will need to create a kubernetes secret
+with the keys installed and mount it into the pod for the application.   Run 
+
+```kubectl create secret generic gcal-credentials --from-file ./secrets.py```
+
+and use the following for the application deployment:
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-simple-mqtt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-simple-mqtt
+  template:
+    metadata:
+      labels:
+        app: python-simple-mqtt
+    spec:
+      nodeSelector:
+        nodetype: pi3
+      containers:
+        - name: python-simple-mqtt
+          image: "ghcr.io/lila/python-simple-mqtt-k3s:main"
+          imagePullPolicy: Always
+          env:
+            - name: MQTT_HOST
+              value: "192.168.86.4" 
+            - name: MQTT_DEBUG
+              value: "true"
+            - name: MQTT_APP
+              value: "gcal.py"
+            - name: MQTT_SLEEP_DURATION
+              value: "120"
+          volumeMounts:
+            - mountPath: "/app/secrets"
+              name: credentials
+              readOnly: true
+      volumes:
+        - name: credentials
+          secret:
+            secretName: gcal-credentials
+```
+
+It uses the same container, but adds an environment variable (`MQTT_APP`) 
+to tell it to run the other app.  the secret credentials get mounted in
+`/app/secrets` for the app to use.  
+
 ## Contributing
 Pull requests are welcome. or just fork and do what you want.
 
