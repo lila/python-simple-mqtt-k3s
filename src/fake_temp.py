@@ -28,5 +28,7 @@ while True:
     r = client.publish(topic, randNumber)
     if debug:
         print(f"Just published {randNumber} to Topic {topic}: {r}")
+
+    
     sys.stdout.flush()
     time.sleep(sleep_duration)

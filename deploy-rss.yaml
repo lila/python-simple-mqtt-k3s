@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pilocator-mqtt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pilocator-mqtt
+  template:
+    metadata:
+      labels:
+        app: pilocator-mqtt
+    spec:
+      nodeSelector:
+        nodetype: pi3
+      containers:
+        - name: pilocator-mqtt
+          image: "ghcr.io/lila/python-simple-mqtt-k3s:main"
+          imagePullPolicy: Always
+          env:
+            - name: MQTT_HOST
+              value: "192.168.86.4" 
+            - name: MQTT_DEBUG
+              value: "true"
+            - name: MQTT_APP
+              value: "rss.py"
+            - name: RSS_FEED
+              value: "https://rpilocator.com/feed.rss"
+            - name: MQTT_SLEEP_DURATION
+              value: "1800"
